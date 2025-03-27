@@ -52,7 +52,8 @@
             overflow: hidden;
         }
 
-        th, td {
+        th,
+        td {
             padding: 10px;
             text-align: center;
             border-bottom: 1px solid #ccc;
@@ -73,7 +74,6 @@
             margin: 10px 0;
         }
 
-        /* Submit Button */
         .submit-btn {
             background-color: #28a745;
             color: white;
@@ -91,7 +91,6 @@
             background-color: #218838;
         }
 
-        /* File Drop Area */
         .file-drop-area {
             border: 2px dashed #007bff;
             padding: 40px;
@@ -131,12 +130,28 @@
         .file-upload-btn:hover {
             background-color: #0056b3;
         }
+
+        .speech-to-text-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .speech-to-text-btn:hover {
+            background-color: #0056b3;
+        }
     </style>
 </head>
 
 <body>
 
-    <!-- NAV -->
     <nav class="navbar navbar-dark">
         <span class="navbar-brand mb-0 h1">Advanced Word Counter</span>
     </nav>
@@ -152,7 +167,6 @@
                 <textarea id="text" placeholder="Enter your text here..."></textarea>
             </div>
             <div class="col-md-4">
-
                 <table>
                     <tr><th>Word Count</th><td id="wordcount">0</td></tr>
                     <tr><th>Character Count</th><td id="charcount">0</td></tr>
@@ -170,6 +184,9 @@
 
                 <!-- Submit Button -->
                 <button class="submit-btn" id="submit-btn">Analyze Text</button>
+
+                <!-- Speech-to-Text Button -->
+                <button class="speech-to-text-btn" id="speech-to-text-btn">Start Speech-to-Text</button>
 
                 <!-- File Upload Area -->
                 <div class="file-drop-area" id="drop-area">
@@ -198,98 +215,97 @@
         const maxlen = document.getElementById('maxlen');
         const fileUpload = document.getElementById('file-upload');
         const dropArea = document.getElementById('drop-area');
+        const speechToTextBtn = document.getElementById('speech-to-text-btn');
 
-        // Handle file drop event
-        dropArea.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            dropArea.style.backgroundColor = 'rgba(0, 123, 255, 0.3)';
+        // Speech-to-Text setup
+        const recognition = new (window.SpeechRecognition || window.webkitSpeechRecognition)();
+        recognition.continuous = true;
+        recognition.lang = 'en-US';
+        recognition.interimResults = true;
+
+        speechToTextBtn.addEventListener('click', () => {
+            recognition.start();
+            speechToTextBtn.textContent = "Listening...";
         });
 
-        dropArea.addEventListener('dragleave', () => {
-            dropArea.style.backgroundColor = 'rgba(0, 123, 255, 0.1)';
-        });
+        recognition.onresult = (event) => {
+            let transcript = '';
+            for (let i = event.resultIndex; i < event.results.length; i++) {
+                transcript += event.results[i][0].transcript;
+            }
+            input.value = transcript;
+            updateTextMetrics();
 
+            // Stop listening when 'goodbye' is heard
+            if (transcript.toLowerCase().includes('goodbye')) {
+                recognition.stop();
+                speechToTextBtn.textContent = "Speech-to-Text Stopped (Goodbye)";
+            }
+        };
+
+        recognition.onerror = (event) => {
+            console.error('Speech Recognition Error: ', event.error);
+            speechToTextBtn.textContent = "Error, Try Again";
+        };
+
+        // File drop area handling
         dropArea.addEventListener('drop', (e) => {
             e.preventDefault();
-            dropArea.style.backgroundColor = 'rgba(0, 123, 255, 0.1)';
             const file = e.dataTransfer.files[0];
             if (file && file.type === 'text/plain') {
                 const reader = new FileReader();
-                reader.onload = function () {
+                reader.onload = function() {
                     input.value = reader.result;
                     updateTextMetrics();
                 };
                 reader.readAsText(file);
-            } else {
-                alert("Please upload a valid text file.");
             }
         });
 
-        // Update the text area with file content if uploaded
-        fileUpload.addEventListener('change', function (e) {
+        dropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+        });
+
+        // File input handling
+        fileUpload.addEventListener('change', (e) => {
             const file = e.target.files[0];
             if (file && file.type === 'text/plain') {
                 const reader = new FileReader();
-                reader.onload = function () {
+                reader.onload = function() {
                     input.value = reader.result;
                     updateTextMetrics();
                 };
                 reader.readAsText(file);
-            } else {
-                alert("Please upload a text file.");
             }
         });
 
+        // Updating text metrics
         input.addEventListener('input', updateTextMetrics);
-        maxlen.addEventListener('input', () => {
-            remainingcount.textContent = maxlen.value - input.value.length;
-        });
+        maxlen.addEventListener('input', updateTextMetrics);
 
         function updateTextMetrics() {
             const text = input.value;
-            const words = text.match(/\b\w+\b/g) || [];
-            const sentences = text.match(/[\w|\)][.?!](\s|$)/g) || [];
-            const paragraphs = text.split(/\n+/).filter(p => p.trim() !== '');
+            const words = text.match(/\w+('\w+)?/g) || [];
+            const sentences = text.split(/[.!?]+/).filter(Boolean);
+            const paragraphs = text.split(/\n+/).filter(Boolean);
 
-            // Word & Char count
             wordcount.textContent = words.length;
             charcount.textContent = text.length;
-
-            // Remaining
             remainingcount.textContent = maxlen.value - text.length;
-
-            // Sentence & Paragraph count
             sentencecount.textContent = sentences.length;
             paragraphcount.textContent = paragraphs.length;
-
-            // Unique Words
-            const unique = [...new Set(words.map(w => w.toLowerCase()))];
-            uniquewordcount.textContent = unique.length;
-
-            // Readability (simple version)
-            readability.textContent = words.length && sentences.length ? (206.835 - 1.015 * (words.length / sentences.length) - 84.6 * (syllables(words) / words.length)).toFixed(2) : 0;
-
-            // Reading Time
-            readingtime.textContent = (words.length / 200).toFixed(2) + ' min';
-
-            // Sentence-to-Word Ratio
-            ratio.textContent = sentences.length ? (words.length / sentences.length).toFixed(2) : 0;
-
-            // Sentiment (simple)
+            uniquewordcount.textContent = new Set(words.map(word => word.toLowerCase())).size;
+            readability.textContent = calculateReadability(words, sentences);
+            readingtime.textContent = Math.ceil(words.length / 200) + " min";
+            ratio.textContent = sentences.length / words.length || 0;
             sentiment.textContent = simpleSentiment(text);
-
-            // Top Keywords
-            const freq = countFreq(words);
-            keywords.innerHTML = Object.entries(freq).slice(0, 5).map(([k, v]) => `${k} (${v})`).join('<br>') || '-';
+            keywords.textContent = topKeywords(text).join(", ");
         }
 
-        function countFreq(words) {
-            const map = {};
-            words.forEach(w => {
-                w = w.toLowerCase();
-                map[w] = (map[w] || 0) + 1;
-            });
-            return Object.fromEntries(Object.entries(map).sort((a, b) => b[1] - a[1]));
+        function calculateReadability(words, sentences) {
+            const syllablesPerWord = syllables(words) / words.length;
+            const wordsPerSentence = words.length / sentences.length;
+            return 206.835 - (1.015 * wordsPerSentence) - (84.6 * syllablesPerWord);
         }
 
         function syllables(words) {
@@ -305,6 +321,19 @@
             negativeWords.forEach(word => { if (text.toLowerCase().includes(word)) score--; });
 
             return score > 0 ? 'Positive' : score < 0 ? 'Negative' : 'Neutral';
+        }
+
+        function topKeywords(text) {
+            const words = text.match(/\b\w+\b/g) || [];
+            const frequency = {};
+            words.forEach(word => {
+                word = word.toLowerCase();
+                frequency[word] = (frequency[word] || 0) + 1;
+            });
+            return Object.entries(frequency)
+                .sort((a, b) => b[1] - a[1])
+                .slice(0, 5)
+                .map(item => item[0]);
         }
     </script>
 </body>
