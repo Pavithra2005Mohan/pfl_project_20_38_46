@@ -1,3 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Word Counter</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.0/css/bootstrap.min.css">
+    <style>
+        body {
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url(https://img.huffingtonpost.com/asset/5e014b6d250000d00798f058.jpeg?cache=4DCk9zhAJs&ops=crop_0_1611_4552_3449%2Cscalefit_720_noupscale);
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            color: #fff;
+        }
+
+        .navbar {
+            border-bottom: 1px solid rgba(0, 26, 51, 0.25);
+            background-color: rgba(0, 0, 0);
+        }
+
+        .jumbo {
+            padding: 10px;
+            margin: auto;
+            width: 60%;
+            text-align: center;
+        }
+
+        .jumbo h1 {
+            color: #ccffff;
+            font-size: 30px;
+            text-transform: uppercase;
+        }
+
+        textarea {
+            width: 100%;
+            height: 300px;
+            padding: 15px;
+            font-size: 1.1rem;
+            resize: none;
+            border-radius: 5px;
+            border: none;
+        }
+
+        table {
+            width: 100%;
+            margin-bottom: 10px;
+            background: #fff;
+            color: #000;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border-bottom: 1px solid #ccc;
+        }
+
+        th {
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+
+        .maxlen-input input {
+            width: 100%;
+            text-align: center;
+            font-weight: 700;
+        }
+
+        #file-upload {
+            margin: 10px 0;
+        }
+
+        /* Submit Button */
+        .submit-btn {
+            background-color: #28a745;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2rem;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 20px;
+            transition: background-color 0.3s ease;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .submit-btn:hover {
+            background-color: #218838;
+        }
+
+        /* File Drop Area */
+        .file-drop-area {
+            border: 2px dashed #007bff;
+            padding: 40px;
+            text-align: center;
+            color: #007bff;
+            border-radius: 10px;
+            margin-top: 20px;
+            background-color: rgba(0, 123, 255, 0.1);
+            transition: background-color 0.3s ease;
+        }
+
+        .file-drop-area:hover {
+            background-color: rgba(0, 123, 255, 0.2);
+        }
+
+        .file-drop-area input {
+            display: none;
+        }
+
+        .file-drop-area p {
+            font-size: 1.1rem;
+        }
+
+        .file-upload-btn {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            padding: 10px 20px;
+            font-size: 1.2rem;
+            margin-top: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .file-upload-btn:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- NAV -->
+    <nav class="navbar navbar-dark">
+        <span class="navbar-brand mb-0 h1">Advanced Word Counter</span>
+    </nav>
+
+    <div class="jumbo">
+        <h1>All-in-One Text Analyzer</h1>
+        <p>Word Counter | Readability | Sentiment | More</p>
+    </div>
+
+    <div class="container">
+        <div class="row">
+            <div class="col-md-8">
+                <textarea id="text" placeholder="Enter your text here..."></textarea>
+            </div>
+            <div class="col-md-4">
+
+                <table>
+                    <tr><th>Word Count</th><td id="wordcount">0</td></tr>
+                    <tr><th>Character Count</th><td id="charcount">0</td></tr>
+                    <tr><th>Remaining</th><td id="remainingcount">100</td></tr>
+                    <tr><th>Sentence Count</th><td id="sentencecount">0</td></tr>
+                    <tr><th>Paragraph Count</th><td id="paragraphcount">0</td></tr>
+                    <tr><th>Unique Words</th><td id="uniquewordcount">0</td></tr>
+                    <tr><th>Readability</th><td id="readability">0</td></tr>
+                    <tr><th>Reading Time</th><td id="readingtime">0 min</td></tr>
+                    <tr><th>Sentence/Word Ratio</th><td id="ratio">0</td></tr>
+                    <tr><th>Sentiment</th><td id="sentiment">Neutral</td></tr>
+                    <tr><th>Top Keywords</th><td id="keywords">-</td></tr>
+                    <tr><th>Max Characters</th><td class="maxlen-input"><input type="number" id="maxlen" value="100"></td></tr>
+                </table>
+
+                <!-- Submit Button -->
+                <button class="submit-btn" id="submit-btn">Analyze Text</button>
+
+                <!-- File Upload Area -->
+                <div class="file-drop-area" id="drop-area">
+                    <p>Drag & Drop a text file here</p>
+                    <input type="file" id="file-upload" accept=".txt">
+                </div>
+
+                <button class="file-upload-btn" onclick="document.getElementById('file-upload').click();">Choose File</button>
+            </div>
+        </div>
+    </div>
+
     <script>
         const input = document.getElementById('text');
         const wordcount = document.getElementById('wordcount');
@@ -12,8 +196,56 @@
         const sentiment = document.getElementById('sentiment');
         const keywords = document.getElementById('keywords');
         const maxlen = document.getElementById('maxlen');
+        const fileUpload = document.getElementById('file-upload');
+        const dropArea = document.getElementById('drop-area');
 
-        input.addEventListener('input', () => {
+        // Handle file drop event
+        dropArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            dropArea.style.backgroundColor = 'rgba(0, 123, 255, 0.3)';
+        });
+
+        dropArea.addEventListener('dragleave', () => {
+            dropArea.style.backgroundColor = 'rgba(0, 123, 255, 0.1)';
+        });
+
+        dropArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropArea.style.backgroundColor = 'rgba(0, 123, 255, 0.1)';
+            const file = e.dataTransfer.files[0];
+            if (file && file.type === 'text/plain') {
+                const reader = new FileReader();
+                reader.onload = function () {
+                    input.value = reader.result;
+                    updateTextMetrics();
+                };
+                reader.readAsText(file);
+            } else {
+                alert("Please upload a valid text file.");
+            }
+        });
+
+        // Update the text area with file content if uploaded
+        fileUpload.addEventListener('change', function (e) {
+            const file = e.target.files[0];
+            if (file && file.type === 'text/plain') {
+                const reader = new FileReader();
+                reader.onload = function () {
+                    input.value = reader.result;
+                    updateTextMetrics();
+                };
+                reader.readAsText(file);
+            } else {
+                alert("Please upload a text file.");
+            }
+        });
+
+        input.addEventListener('input', updateTextMetrics);
+        maxlen.addEventListener('input', () => {
+            remainingcount.textContent = maxlen.value - input.value.length;
+        });
+
+        function updateTextMetrics() {
             const text = input.value;
             const words = text.match(/\b\w+\b/g) || [];
             const sentences = text.match(/[\w|\)][.?!](\s|$)/g) || [];
@@ -49,11 +281,7 @@
             // Top Keywords
             const freq = countFreq(words);
             keywords.innerHTML = Object.entries(freq).slice(0, 5).map(([k, v]) => `${k} (${v})`).join('<br>') || '-';
-        });
-
-        maxlen.addEventListener('input', () => {
-            remainingcount.textContent = maxlen.value - input.value.length;
-        });
+        }
 
         function countFreq(words) {
             const map = {};
@@ -65,17 +293,20 @@
         }
 
         function syllables(words) {
-            return words.reduce((sum, w) => sum + (w.match(/[aeiouy]{1,2}/gi) || []).length, 0);
+            return words.reduce((acc, word) => acc + word.replace(/[^aeiouy]/gi, '').length, 0);
         }
 
         function simpleSentiment(text) {
-            const positive = ['good', 'happy', 'excellent', 'awesome', 'great', 'positive'];
-            const negative = ['bad', 'sad', 'terrible', 'awful', 'poor', 'negative'];
+            const positiveWords = ["good", "great", "happy", "joy", "awesome"];
+            const negativeWords = ["bad", "sad", "angry", "hate", "terrible"];
             let score = 0;
-            positive.forEach(word => { if (text.toLowerCase().includes(word)) score++; });
-            negative.forEach(word => { if (text.toLowerCase().includes(word)) score--; });
-            if (score > 0) return 'Positive';
-            if (score < 0) return 'Negative';
-            return 'Neutral';
+
+            positiveWords.forEach(word => { if (text.toLowerCase().includes(word)) score++; });
+            negativeWords.forEach(word => { if (text.toLowerCase().includes(word)) score--; });
+
+            return score > 0 ? 'Positive' : score < 0 ? 'Negative' : 'Neutral';
         }
     </script>
+</body>
+
+</html>
