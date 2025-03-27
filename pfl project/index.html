@@ -1,21 +1,81 @@
-<!DOCTYPE html>
-<html lang="en">
+    <script>
+        const input = document.getElementById('text');
+        const wordcount = document.getElementById('wordcount');
+        const charcount = document.getElementById('charcount');
+        const remainingcount = document.getElementById('remainingcount');
+        const sentencecount = document.getElementById('sentencecount');
+        const paragraphcount = document.getElementById('paragraphcount');
+        const uniquewordcount = document.getElementById('uniquewordcount');
+        const readability = document.getElementById('readability');
+        const readingtime = document.getElementById('readingtime');
+        const ratio = document.getElementById('ratio');
+        const sentiment = document.getElementById('sentiment');
+        const keywords = document.getElementById('keywords');
+        const maxlen = document.getElementById('maxlen');
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Text Analyzer</title>
-    <link rel="stylesheet" href="style.css">
-</head>
+        input.addEventListener('input', () => {
+            const text = input.value;
+            const words = text.match(/\b\w+\b/g) || [];
+            const sentences = text.match(/[\w|\)][.?!](\s|$)/g) || [];
+            const paragraphs = text.split(/\n+/).filter(p => p.trim() !== '');
 
-<body>
-    <div class="container">
-        <h1>Text Analyzer</h1>
-        <textarea id="inputText" placeholder="Type or paste text here..."></textarea>
-        <button onclick="analyzeText()">Analyze</button>
-        <div id="results"></div>
-    </div>
-    <script src="app.js"></script>
-</body>
+            // Word & Char count
+            wordcount.textContent = words.length;
+            charcount.textContent = text.length;
 
-</html>
+            // Remaining
+            remainingcount.textContent = maxlen.value - text.length;
+
+            // Sentence & Paragraph count
+            sentencecount.textContent = sentences.length;
+            paragraphcount.textContent = paragraphs.length;
+
+            // Unique Words
+            const unique = [...new Set(words.map(w => w.toLowerCase()))];
+            uniquewordcount.textContent = unique.length;
+
+            // Readability (simple version)
+            readability.textContent = words.length && sentences.length ? (206.835 - 1.015 * (words.length / sentences.length) - 84.6 * (syllables(words) / words.length)).toFixed(2) : 0;
+
+            // Reading Time
+            readingtime.textContent = (words.length / 200).toFixed(2) + ' min';
+
+            // Sentence-to-Word Ratio
+            ratio.textContent = sentences.length ? (words.length / sentences.length).toFixed(2) : 0;
+
+            // Sentiment (simple)
+            sentiment.textContent = simpleSentiment(text);
+
+            // Top Keywords
+            const freq = countFreq(words);
+            keywords.innerHTML = Object.entries(freq).slice(0, 5).map(([k, v]) => `${k} (${v})`).join('<br>') || '-';
+        });
+
+        maxlen.addEventListener('input', () => {
+            remainingcount.textContent = maxlen.value - input.value.length;
+        });
+
+        function countFreq(words) {
+            const map = {};
+            words.forEach(w => {
+                w = w.toLowerCase();
+                map[w] = (map[w] || 0) + 1;
+            });
+            return Object.fromEntries(Object.entries(map).sort((a, b) => b[1] - a[1]));
+        }
+
+        function syllables(words) {
+            return words.reduce((sum, w) => sum + (w.match(/[aeiouy]{1,2}/gi) || []).length, 0);
+        }
+
+        function simpleSentiment(text) {
+            const positive = ['good', 'happy', 'excellent', 'awesome', 'great', 'positive'];
+            const negative = ['bad', 'sad', 'terrible', 'awful', 'poor', 'negative'];
+            let score = 0;
+            positive.forEach(word => { if (text.toLowerCase().includes(word)) score++; });
+            negative.forEach(word => { if (text.toLowerCase().includes(word)) score--; });
+            if (score > 0) return 'Positive';
+            if (score < 0) return 'Negative';
+            return 'Neutral';
+        }
+    </script>
