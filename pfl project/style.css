@@ -1,0 +1,138 @@
+/* Body Styling */
+body {
+    background-image: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.8)), url(https://img.huffingtonpost.com/asset/5e014b6d250000d00798f058.jpeg?cache=4DCk9zhAJs&ops=crop_0_1611_4552_3449%2Cscalefit_720_noupscale);
+    background-size: cover;
+    background-position: center;
+    background-attachment: fixed;
+    font-family: 'Open Sans', sans-serif;
+}
+
+/* Heading Styling */
+#brand {
+    color: #fff;
+    text-transform: uppercase;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-decoration: none;
+}
+
+/* Navbar Styling */
+#nav {
+    border-bottom: 1px solid rgba(0, 26, 51, 0.25);
+}
+
+.bg-nav {
+    background-color: rgba(0, 0, 0);
+}
+
+/* Jumbo Section */
+.jumbo {
+    padding: 10px;
+    margin: auto;
+    width: 60%;
+}
+
+.jumbo-head {
+    font-family: 'Open Sans', sans-serif;
+    font-size: 30px;
+    font-weight: 400px;
+    text-align: center;
+    text-transform: uppercase;
+    color: #ccffff;
+}
+
+.lead {
+    text-align: center;
+    color: #ddd;
+}
+
+/* Text Area */
+textarea {
+    font-size: larger !important;
+    padding: 15px !important;
+    width: 100%;
+    border-radius: 8px;
+    border: 1px solid #ccc;
+    background: #f4f4f4;
+    color: #333;
+}
+
+/* Button */
+button {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 16px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #45a049;
+}
+
+/* Results Section */
+#analysis-results {
+    margin-top: 20px;
+    background-color: #f9f9f9;
+    padding: 15px;
+    border-radius: 5px;
+    border: 1px solid #ddd;
+}
+
+#analysis-results pre {
+    white-space: pre-wrap;
+    word-wrap: break-word;
+}
+
+/* Table Styling for Results */
+.table-card {
+    width: 100%;
+    margin: auto;
+    margin-bottom: 10px;
+}
+
+table {
+    border: 1px solid #000;
+    width: 100%;
+    border-radius: 8px;
+}
+
+th, td {
+    padding: 10px;
+    text-align: center;
+    background: #fff;
+    color: #000;
+}
+
+th {
+    font-weight: 600;
+    text-transform: uppercase;
+    text-align: center !important;
+    border-bottom: 1px solid #000;
+}
+
+/* Maximum Length Text Styling */
+#maxlen {
+    width: 100%;
+    padding: 10px;
+    text-align: center;
+    font-weight: 700;
+}
+
+.maxlen-input {
+    margin: 0;
+    padding: 0;
+}
+
+/* Footer Styling */
+.footer {
+    padding: 20px;
+    margin-top: 10px;
+    text-align: center;
+    background-color: #333;
+    color: white;
+}
